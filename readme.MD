@@ -17,7 +17,7 @@ For iris example, download `iris_landmark.tflite` into `models` directory:
 wget -P models https://github.com/google/mediapipe/raw/master/mediapipe/modules/iris_landmark/iris_landmark.tflite
 ```
 
-## RUN
+## How to run
 
 One of the following:
 
