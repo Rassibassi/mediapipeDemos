@@ -58,7 +58,7 @@ class PCF:
         self.fy = fy
 
         fov_y = 2 * np.arctan(frame_height / (2 * fy))
-        kDegreesToRadians = np.pi / 180.0
+        # kDegreesToRadians = np.pi / 180.0 # never used
         height_at_near = 2 * near * np.tan(0.5 * fov_y)
         width_at_near = frame_width * height_at_near / frame_height
 

@@ -156,7 +156,9 @@ def main(inp):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Choose video file otherwise webcam is used.")
+    parser = argparse.ArgumentParser(
+        description="Choose video file otherwise webcam is used."
+    )
     parser.add_argument(
         "-i", metavar="path-to-file", type=str, help="Path to video file"
     )
