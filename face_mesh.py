@@ -1,6 +1,6 @@
 import mediapipe as mp
 
-from webcam import WebcamSource
+from videosource import WebcamSource
 
 mp_drawing = mp.solutions.drawing_utils
 mp_face_mesh = mp.solutions.face_mesh

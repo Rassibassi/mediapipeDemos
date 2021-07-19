@@ -1,8 +1,7 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-
-from webcam import WebcamSource
+from videosource import WebcamSource
 
 mp_drawing = mp.solutions.drawing_utils
 mp_selfie_segmentation = mp.solutions.selfie_segmentation

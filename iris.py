@@ -1,21 +1,11 @@
+import argparse
+
 import cv2
 import mediapipe as mp
 import numpy as np
 
-from webcam import WebcamSource
-
-from custom.iris_lm_depth import (  # isort:skip
-    calculate_iris_depth,
-    detect_iris,
-    from_landmarks_to_depth,
-)
-
-from custom.core import (  # isort:skip
-    detections_to_rect,
-    landmarks_to_detections,
-    slice_from_roi,
-    transform_rect,
-)
+from custom.iris_lm_depth import from_landmarks_to_depth
+from videosource import FileSource, WebcamSource
 
 mp_face_mesh = mp.solutions.face_mesh
 
@@ -23,22 +13,8 @@ points_idx = [33, 133, 362, 263, 61, 291, 199]
 points_idx = list(set(points_idx))
 points_idx.sort()
 
-frame_height, frame_width, channels = (720, 1280, 3)
-image_size = (frame_width, frame_height)
-
 left_eye_landmarks_id = np.array([33, 133])
 right_eye_landmarks_id = np.array([362, 263])
-
-frame_height, frame_width, channels = (720, 1280, 3)
-frame_size = np.array((frame_width, frame_height))
-
-# pseudo camera internals
-focal_length = frame_width
-center = (frame_width / 2, frame_height / 2)
-camera_matrix = np.array(
-    [[focal_length, 0, center[0]], [0, focal_length, center[1]], [0, 0, 1]],
-    dtype="double",
-)
 
 dist_coeff = np.zeros((4, 1))
 
@@ -50,21 +26,28 @@ SMALL_CIRCLE_SIZE = 1
 LARGE_CIRCLE_SIZE = 2
 
 
-def main():
-    source = WebcamSource(width=frame_width, height=frame_height)
+def main(inp):
+    if inp is None:
+        frame_height, frame_width = (720, 1280)
+        source = WebcamSource(width=frame_width, height=frame_height)
+    else:
+        source = FileSource(inp)
+        frame_width, frame_height = (int(i) for i in source.get_image_size())
+
+    image_size = (frame_width, frame_height)
+
+    # pseudo camera internals
+    focal_length = frame_width
 
     landmarks = None
     smooth_left_depth = -1
     smooth_right_depth = -1
     smooth_factor = 0.1
-    face_mesh = mp_face_mesh.FaceMesh(
+
+    with mp_face_mesh.FaceMesh(
         static_image_mode=False,
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5,
-    )
-
-    with mp_face_mesh.FaceMesh(
-        min_detection_confidence=0.5, min_tracking_confidence=0.5
     ) as face_mesh:
 
         for idx, (frame, frame_rgb) in enumerate(source):
@@ -129,7 +112,7 @@ def main():
 
                 # draw subset of facemesh
                 for ii in points_idx:
-                    pos = (frame_size * landmarks[:2, ii]).astype(np.int32)
+                    pos = (np.array(image_size) * landmarks[:2, ii]).astype(np.int32)
                     frame = cv2.circle(frame, tuple(pos), LARGE_CIRCLE_SIZE, GREEN, -1)
 
                 # draw eye contours
@@ -140,7 +123,7 @@ def main():
                     ]
                 )
                 for landmark in eye_landmarks:
-                    pos = (frame_size * landmark[:2]).astype(np.int32)
+                    pos = (np.array(image_size) * landmark[:2]).astype(np.int32)
                     frame = cv2.circle(frame, tuple(pos), SMALL_CIRCLE_SIZE, RED, -1)
 
                 # draw iris landmarks
@@ -151,7 +134,7 @@ def main():
                     ]
                 )
                 for landmark in iris_landmarks:
-                    pos = (frame_size * landmark[:2]).astype(np.int32)
+                    pos = (np.array(image_size) * landmark[:2]).astype(np.int32)
                     frame = cv2.circle(frame, tuple(pos), SMALL_CIRCLE_SIZE, YELLOW, -1)
 
                 # write depth values into frame
@@ -173,4 +156,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Choose video file otherwise webcam is used.")
+    parser.add_argument(
+        "-i", metavar="path-to-file", type=str, help="Path to video file"
+    )
+
+    args = parser.parse_args()
+    main(args.i)

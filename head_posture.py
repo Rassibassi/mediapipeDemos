@@ -2,7 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-from webcam import WebcamSource
+from videosource import WebcamSource
 
 from custom.face_geometry import (  # isort:skip
     PCF,
