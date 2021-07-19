@@ -1,15 +1,20 @@
+import argparse
+
 import mediapipe as mp
 import numpy as np
 
-from videosource import WebcamSource
+from videosource import FileSource, WebcamSource
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=3)
 
 
-def main():
-    source = WebcamSource()
+def main(inp):
+    if inp is None:
+        source = WebcamSource()
+    else:
+        source = FileSource(inp)
 
     with mp_pose.Pose(
         min_detection_confidence=0.5, min_tracking_confidence=0.5
@@ -39,4 +44,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Choose video file otherwise webcam is used.")
+    parser.add_argument(
+        "-i", metavar="path-to-file", type=str, help="Path to video file"
+    )
+
+    args = parser.parse_args()
+    main(args.i)
