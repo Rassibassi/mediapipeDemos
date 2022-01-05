@@ -53,7 +53,7 @@ def main():
     ) as face_mesh:
 
         for idx, (frame, frame_rgb) in enumerate(source):
-            results = face_mesh.process(frame)
+            results = face_mesh.process(frame_rgb)
             multi_face_landmarks = results.multi_face_landmarks
 
             if multi_face_landmarks:
