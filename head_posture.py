@@ -72,6 +72,7 @@ def main():
                     landmarks[0:2, points_idx].T
                     * np.array([frame_width, frame_height])[None, :]
                 )
+                model_points = metric_landmarks[0:3, points_idx].T
 
                 # see here:
                 # https://github.com/google/mediapipe/issues/1379#issuecomment-752534379
@@ -82,7 +83,6 @@ def main():
                 if False:
                     # sanity check
                     # get same result with solvePnP
-                    model_points = metric_landmarks[0:3, points_idx].T
 
                     success, rotation_vector, translation_vector = cv2.solvePnP(
                         model_points,
@@ -97,14 +97,6 @@ def main():
                         mp_translation_vector, translation_vector
                     )
 
-                (nose_end_point2D, jacobian) = cv2.projectPoints(
-                    np.array([(0.0, 0.0, 25.0)]),
-                    mp_rotation_vector,
-                    mp_translation_vector,
-                    camera_matrix,
-                    dist_coeff,
-                )
-
                 for face_landmarks in multi_face_landmarks:
                     mp_drawing.draw_landmarks(
                         image=frame,
@@ -114,10 +106,20 @@ def main():
                         connection_drawing_spec=drawing_spec,
                     )
 
-                p1 = (int(image_points[0][0]), int(image_points[0][1]))
-                p2 = (int(nose_end_point2D[0][0][0]), int(nose_end_point2D[0][0][1]))
+                nose_tip = model_points[0]
+                nose_tip_extended = 2.5 * model_points[0]
+                (nose_pointer2D, jacobian) = cv2.projectPoints(
+                    np.array([nose_tip, nose_tip_extended]),
+                    mp_rotation_vector,
+                    mp_translation_vector,
+                    camera_matrix,
+                    dist_coeff,
+                )
 
-                frame = cv2.line(frame, p1, p2, (255, 0, 0), 2)
+                nose_tip_2D, nose_tip_2D_extended = nose_pointer2D.squeeze().astype(int)
+                frame = cv2.line(
+                    frame, nose_tip_2D, nose_tip_2D_extended, (255, 0, 0), 2
+                )
 
             source.show(frame)
 
