@@ -67,24 +67,40 @@ def main():
                 metric_landmarks, pose_transform_mat = get_metric_landmarks(
                     landmarks.copy(), pcf
                 )
-                model_points = metric_landmarks[0:3, points_idx].T
+
                 image_points = (
                     landmarks[0:2, points_idx].T
                     * np.array([frame_width, frame_height])[None, :]
                 )
 
-                success, rotation_vector, translation_vector = cv2.solvePnP(
-                    model_points,
-                    image_points,
-                    camera_matrix,
-                    dist_coeff,
-                    flags=cv2.cv2.SOLVEPNP_ITERATIVE,
-                )
+                # see here:
+                # https://github.com/google/mediapipe/issues/1379#issuecomment-752534379
+                pose_transform_mat[1:3, :] = -pose_transform_mat[1:3, :]
+                mp_rotation_vector, _ = cv2.Rodrigues(pose_transform_mat[:3, :3])
+                mp_translation_vector = pose_transform_mat[:3, 3, None]
+
+                if False:
+                    # sanity check
+                    # get same result with solvePnP
+                    model_points = metric_landmarks[0:3, points_idx].T
+
+                    success, rotation_vector, translation_vector = cv2.solvePnP(
+                        model_points,
+                        image_points,
+                        camera_matrix,
+                        dist_coeff,
+                        flags=cv2.cv2.SOLVEPNP_ITERATIVE,
+                    )
+
+                    np.testing.assert_almost_equal(mp_rotation_vector, rotation_vector)
+                    np.testing.assert_almost_equal(
+                        mp_translation_vector, translation_vector
+                    )
 
                 (nose_end_point2D, jacobian) = cv2.projectPoints(
                     np.array([(0.0, 0.0, 25.0)]),
-                    rotation_vector,
-                    translation_vector,
+                    mp_rotation_vector,
+                    mp_translation_vector,
                     camera_matrix,
                     dist_coeff,
                 )

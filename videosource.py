@@ -4,11 +4,12 @@ from PIL import Image
 
 
 class VideoSource:
-    def __init__(self, display=False, dtype=np.uint8):
+    def __init__(self, flip=False, display=False, dtype=np.uint8):
         self._name = "VideoSource"
         self._capture = None
         self._display = display
         self._dtype = dtype
+        self._flip = flip
 
     def get_fps(self):
         return self._capture.get(cv2.CAP_PROP_FPS)
@@ -31,6 +32,9 @@ class VideoSource:
 
     def __next__(self):
         ret, frame = self._capture.read()
+
+        if self._flip:
+            frame = cv2.flip(frame, 3)
 
         if self._display:
             cv2.imshow(f"{self._name} - FPS: {self.get_fps()}", frame)
@@ -62,9 +66,10 @@ class WebcamSource(VideoSource):
         fps=30,
         autofocus=0,
         absolute_focus=75,
+        flip=True,
         display=False,
     ):
-        super().__init__(display)
+        super().__init__(flip, display)
         self._capture = cv2.VideoCapture(camera_id)
         self._capture.set(cv2.CAP_PROP_FRAME_WIDTH, width)
         self._capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
@@ -75,6 +80,6 @@ class WebcamSource(VideoSource):
 
 
 class FileSource(VideoSource):
-    def __init__(self, file_path, display=False):
-        super().__init__(display)
+    def __init__(self, file_path, flip=False, display=False):
+        super().__init__(flip, display)
         self._capture = cv2.VideoCapture(str(file_path))
