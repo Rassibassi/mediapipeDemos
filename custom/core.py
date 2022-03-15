@@ -166,3 +166,43 @@ def slice_from_roi(roi, image_size, horizontal_side=True):
     second_id = int((center + norm_side / 2) * image_side)
 
     return (first_id, second_id)
+
+
+def extract_faces(raw_frame, results, x_scale=1.0, y_scale=1.0):
+    frames = []
+    if results.detections is None:
+        return frames
+    for detection in results.detections:
+        image_size = raw_frame.shape[1::-1]
+        x_min = detection.location_data.relative_bounding_box.xmin
+        y_min = detection.location_data.relative_bounding_box.ymin
+        width = detection.location_data.relative_bounding_box.width
+        height = detection.location_data.relative_bounding_box.height
+
+        x_min = image_size[0] * x_min
+        y_min = image_size[1] * y_min
+        width = image_size[0] * width
+        height = image_size[1] * height
+        x_max = x_min + width
+        y_max = y_min + height
+
+        x_center = (x_min + x_max) / 2
+        y_center = (y_min + y_max) / 2
+
+        width = x_scale * width
+        height = y_scale * height
+
+        x_min = x_center - width / 2
+        y_min = y_center - height / 2
+
+        x_max = x_min + width
+        y_max = y_min + height
+
+        x_min, x_max, y_min, y_max = map(int, [x_min, x_max, y_min, y_max])
+
+        frame = raw_frame[y_min:y_max, x_min:x_max]
+
+        if frame.any():
+            frames.append(frame)
+
+    return frames
