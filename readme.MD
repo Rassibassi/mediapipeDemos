@@ -17,6 +17,14 @@ For the iris example, download `iris_landmark.tflite` into `models` directory:
 wget -P models https://github.com/google/mediapipe/raw/master/mediapipe/modules/iris_landmark/iris_landmark.tflite
 ```
 
+The facial expression example uses the trained weights from [github.com/zengqunzhao/EfficientFace](https://github.com/zengqunzhao/EfficientFace), but converted to tflite.
+For the facial expression example download both models (fast and slow) into the `models` directory:
+
+```
+wget -P model https://rassibassi-mediapipedemos.s3.eu-central-1.amazonaws.com/efficient_face_model.tflite
+wget -P model https://rassibassi-mediapipedemos.s3.eu-central-1.amazonaws.com/dlg_model.tflite
+```
+
 ## How to run
 
 One of the following:
