@@ -30,6 +30,7 @@ wget -P model https://rassibassi-mediapipedemos.s3.eu-central-1.amazonaws.com/dl
 One of the following:
 
 ```
+python facial_expression.py
 python face_detection.py
 python face_mesh.py
 python hands.py
