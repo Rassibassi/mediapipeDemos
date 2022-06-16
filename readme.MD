@@ -21,8 +21,8 @@ The facial expression example uses the trained weights from [github.com/zengqunz
 For the facial expression example download both models (fast and slow) into the `models` directory:
 
 ```
-wget -P model https://rassibassi-mediapipedemos.s3.eu-central-1.amazonaws.com/efficient_face_model.tflite
-wget -P model https://rassibassi-mediapipedemos.s3.eu-central-1.amazonaws.com/dlg_model.tflite
+wget -P models https://rassibassi-mediapipedemos.s3.eu-central-1.amazonaws.com/efficient_face_model.tflite
+wget -P models https://rassibassi-mediapipedemos.s3.eu-central-1.amazonaws.com/dlg_model.tflite
 ```
 
 ## How to run
