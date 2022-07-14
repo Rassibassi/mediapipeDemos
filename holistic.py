@@ -4,6 +4,7 @@ from videosource import WebcamSource
 
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
+mp_face_mesh_connections = mp.solutions.face_mesh_connections
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=3)
 
 
@@ -21,7 +22,7 @@ def main():
             mp_drawing.draw_landmarks(
                 frame,
                 results.face_landmarks,
-                mp_holistic.FACE_CONNECTIONS,
+                connections=mp_face_mesh_connections.FACEMESH_TESSELATION,
                 landmark_drawing_spec=drawing_spec,
                 connection_drawing_spec=drawing_spec,
             )

@@ -12,6 +12,7 @@ from custom.face_geometry import (  # isort:skip
 
 mp_drawing = mp.solutions.drawing_utils
 mp_face_mesh = mp.solutions.face_mesh
+mp_face_mesh_connections = mp.solutions.face_mesh_connections
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=3)
 
 points_idx = [33, 263, 61, 291, 199]
@@ -38,6 +39,8 @@ dist_coeff = np.zeros((4, 1))
 def main():
     source = WebcamSource()
 
+    refine_landmarks = True
+
     pcf = PCF(
         near=1,
         far=10000,
@@ -48,6 +51,7 @@ def main():
 
     with mp_face_mesh.FaceMesh(
         static_image_mode=False,
+        refine_landmarks=refine_landmarks,
         min_detection_confidence=0.5,
         min_tracking_confidence=0.5,
     ) as face_mesh:
@@ -63,6 +67,9 @@ def main():
                 )
                 # print(landmarks.shape)
                 landmarks = landmarks.T
+
+                if refine_landmarks:
+                    landmarks = landmarks[:, :468]
 
                 metric_landmarks, pose_transform_mat = get_metric_landmarks(
                     landmarks.copy(), pcf
@@ -101,7 +108,7 @@ def main():
                     mp_drawing.draw_landmarks(
                         image=frame,
                         landmark_list=face_landmarks,
-                        connections=mp_face_mesh.FACE_CONNECTIONS,
+                        connections=mp_face_mesh_connections.FACEMESH_TESSELATION,
                         landmark_drawing_spec=drawing_spec,
                         connection_drawing_spec=drawing_spec,
                     )
