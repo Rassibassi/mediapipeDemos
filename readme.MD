@@ -12,9 +12,9 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
-For the iris example, download `iris_landmark.tflite` into `models` directory:
+For the iris example, put `iris_landmark.tflite` into `models` directory, by unpacking following zip file:
 ```
-wget -P models https://github.com/google/mediapipe/raw/master/mediapipe/modules/iris_landmark/iris_landmark.tflite
+https://github.com/google/mediapipe/files/10012191/iris_landmark.zip
 ```
 
 The facial expression example uses the trained weights from [github.com/zengqunzhao/EfficientFace](https://github.com/zengqunzhao/EfficientFace), but converted to tflite.
