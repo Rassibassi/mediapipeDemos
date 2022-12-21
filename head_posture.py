@@ -23,7 +23,10 @@ points_idx.sort()
 # uncomment next line to use all points for PnP algorithm
 # points_idx = list(range(0,468)); points_idx[0:2] = points_idx[0:2:-1];
 
-frame_height, frame_width, channels = (720, 1280, 3)
+cap  = cv2.VideoCapture(0)
+_, frame = cap.read()
+frame_height, frame_width, channels = frame.shape
+del cap, frame
 
 # pseudo camera internals
 focal_length = frame_width
